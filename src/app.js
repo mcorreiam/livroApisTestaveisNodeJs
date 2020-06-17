@@ -8,4 +8,12 @@ app.get('/', (req, res)=>{
     res.send('Hello Word!')
 });
 
+app.get('/products', (req, res) => {
+    res.send([{
+        name:'Default product',
+        description:'product description',
+        price: 100
+    }])
+});
+
 module.exports = app
