@@ -1,11 +1,9 @@
 const express = require('express');
-const router =  express.Router();
+const ProductsController = require('../controllers/products');
 
-router.get('/', (req, res) => res.send([{
-        name:'Default product',
-        description:'product description',
-        price: 100
-    }])
-);
+const router =  express.Router();
+const productsController = new ProductsController();
+
+router.get('/', (req, res) => productsController.get(req, res));
 
 module.exports = router;
