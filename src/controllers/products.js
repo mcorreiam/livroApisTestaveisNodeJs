@@ -11,6 +11,19 @@ class ProductsController{
             res.status(400).send(err.message);
         }
     }
+
+    async getById(req, res) {
+       const {
+           params: {id}
+       } = req;
+
+       try {
+           const product = await this.Product.find({ _id: id});
+           res.send(product);
+       } catch (err) {
+           res.status(400).send(err.message);
+       }
+    }
 }
 
 module.exports = ProductsController;
