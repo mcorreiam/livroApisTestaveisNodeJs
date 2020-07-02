@@ -24,6 +24,26 @@ class ProductsController{
            res.status(400).send(err.message);
        }
     }
+
+    async create(req, res){
+        const product = new this.Product(req.body);
+        try {
+            await product.save();
+            res.status(201).send(product);    
+        } catch (err) {
+            res.status(422).send(err.message);
+        }        
+    }
+
+    async update(req, res) {
+        try {
+            await this.Product.updateOne({ _id: req.params.id}, req.body);
+            res.sendStatus(200)
+        } catch (err) {
+            res.status(422).send(err.message);
+        }
+       
+    }
 }
 
 module.exports = ProductsController;

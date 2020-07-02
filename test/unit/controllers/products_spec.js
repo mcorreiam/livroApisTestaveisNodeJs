@@ -67,4 +67,134 @@ describe('Controller: Products', ()=>{
             sinon.assert.calledWith(response.send, defaultProduct);
         });
     });
+
+    describe('create() product', ()=>{
+        it('shold save a new product successfully', async()=>{
+            const requestWithBody = Object.assign(
+                {},
+                {body: defaultProduct[0]},
+                defaultRequest
+            );
+            
+            const response = {
+                send: sinon.spy(),
+                status: sinon.stub()
+            };
+            
+            class fakeProduct {
+                save() {}
+            }
+
+            response.status.withArgs(201).returns(response);
+            sinon
+                .stub(fakeProduct.prototype, 'save')
+                .withArgs()
+                .resolves();
+            
+            const productsController = new ProductsController(fakeProduct);
+
+            await productsController.create(requestWithBody, response);
+            sinon.assert.calledWith(response.send);
+
+        });
+
+        context('when an error occurs', () => {
+            it('shold return 422', async() => {
+                const response = {
+                    send: sinon.spy(),
+                    status: sinon.stub()
+                };
+
+                class fakeProduct {
+                    save() {}
+                }
+
+                response.status.withArgs(422).returns(response);
+                sinon
+                    .stub(fakeProduct.prototype, 'save')
+                    .withArgs()
+                    .rejects({message: 'Error'});
+                
+                const productsController = new ProductsController(fakeProduct);
+
+                await productsController.create(defaultRequest, response);
+                sinon.assert.calledWith(response.status, 422);
+            });
+        });
+    });
+
+    describe('update() product', () => {
+        it('should respond wirh 200 whe de product fas been updated', async () => {
+            const fakeId = 'a-fake-id';
+            const updatedProduct = {
+                _id: fakeId,
+                name: 'Updated product',
+                description: 'Updated description',
+                price: 150
+            };
+            const request = {
+                params: {
+                    id: fakeId
+                },
+                body: updatedProduct
+            };
+            const response = {
+                sendStatus: sinon.spy()
+            }
+
+            class fakeProduct{
+                static updateOne(){}
+            }
+
+            const updateOneStub = sinon.stub(fakeProduct, 'updateOne');
+            updateOneStub
+                .withArgs({ _id: fakeId }, updatedProduct)
+                .resolves(updatedProduct)
+
+            const productsController = new ProductsController(fakeProduct);
+
+            await productsController.update(request, response);
+            sinon.assert.calledWith(response.sendStatus, 200);
+        });
+
+        context('when an error occurs', () => {
+            it('should return 422', async() => {
+                const fakeId = 'a-fake-id';
+                const updateProduct = {
+                    _id: fakeId,
+                    name: 'Update product',
+                    description: 'Updated description',
+                    price: 150
+                };
+                const request = {
+                    params: {
+                        id: fakeId
+                    },
+                    body: updateProduct
+                };
+                const response = {
+                    send: sinon.spy(),
+                    status: sinon.stub()
+                };
+
+                class fakeProduct {
+                    static updateOne() {}
+                }
+
+                const updateOneStub = sinon.stub(
+                    fakeProduct,
+                    'updateOne'
+                )
+
+                updateOneStub
+                    .withArgs({_id: fakeId}, updateProduct)
+                    .rejects({message: 'Error'});
+                response.status.withArgs(422).returns(response);
+
+                const productsController = new ProductsController(fakeProduct);
+                await productsController.update(request, response);
+                sinon.assert.calledWith(response.send, 'Error');
+            });
+        });
+    });
 })

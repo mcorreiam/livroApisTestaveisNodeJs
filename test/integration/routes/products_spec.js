@@ -59,5 +59,47 @@ describe('Routes: Products', () => {
         });
     });
 
-    
+    describe('POST /products', () => {
+        context('when posting a produt', () => {
+            it('should return a new product with status code 201', done => {
+               const customId = '56cb91bdc3464f14678934ba';
+               const newProduct = Object.assign({},{_id: customId, __v:0}, defaultProduct);
+               const expectedSaveProduct = {
+                   __v: 0,
+                   _id: customId,
+                   name: 'Default product',
+                   description: 'product description',
+                   price: 100
+               };
+
+               request
+                .post('/products')
+                .send(newProduct)
+                .end((err, res) => {
+                    expect(res.statusCode).to.eql(201);
+                    expect(res.body).to.eql(expectedSaveProduct);
+                    done(err);
+                });
+            });
+        });
+    });
+
+    describe('PUT /products/:id', () => {
+        context('when editing a product', () => {
+            it('shold update the product and return 200 as status code', done => {
+                const customProduct = {
+                    name: 'Custom name'
+                };
+                const updatedProduct = Object.assign({}, customProduct, defaultProduct);
+
+                request
+                    .put(`/products/${defaultId}`)
+                    .send(updatedProduct)
+                    .end((err, res) => {
+                        expect(res.status).to.eql(200);
+                        done(err);
+                    });
+            })
+        });
+    });
 })
