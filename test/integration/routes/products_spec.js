@@ -1,5 +1,4 @@
 const Product = require("../../../src/models/products");
-const { expect } = require("chai");
 
 describe('Routes: Products', () => {
     let request;
@@ -97,6 +96,19 @@ describe('Routes: Products', () => {
                     .send(updatedProduct)
                     .end((err, res) => {
                         expect(res.status).to.eql(200);
+                        done(err);
+                    });
+            })
+        });
+    });
+
+    describe('DELETE /products/:id', () => {
+        context('when deleting a product', () => {
+            it('shold delete a product and return 204 as status code', done => {                
+                request
+                    .delete(`/products/${defaultId}`)
+                    .end((err, res) => {
+                        expect(res.status).to.eql(204);
                         done(err);
                     });
             })
