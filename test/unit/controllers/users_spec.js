@@ -1,6 +1,9 @@
 const UsersController = require('../../../src/controllers/users');
 const sinon = require('sinon');
 const User = require('../../../src/models/user');
+const jwt = require('jsonwebtoken');
+const config = require('config');
+const bcrypt = require('bcrypt');
 
 describe('Controller: Users', () => {
     const defaultUser = [
@@ -251,4 +254,37 @@ describe('Controller: Users', () => {
             });
         });
     });
+
+    describe('authenticate', () => {
+        it('should authenticate a user', async () => {
+            const fakeUserModel = {
+                findOne: sinon.stub()
+            };
+            const user = {
+                name: 'Jon Doe',
+                email: 'jhondoe@mail.com',
+                password:'12345',
+                role: 'admin'
+            };
+
+            const userWithEncryptedPassword = {...user, password: bcrypt.hashSync(user.password, 10) }; 
+
+            fakeUserModel.findOne.withArgs({ email: user.email }).resolves({...userWithEncryptedPassword, toJSON: () => ({ email: user.email })  }); 
+            
+            const jwtToken = jwt.sign(
+                userWithEncryptedPassword, 
+                config.get('auth.key'),
+                {expiresIn:config.get('auth.tokenExpiresIn')});
+
+            const fakeReq = {
+                body: user
+            };
+            const fakeRes = {
+                send:sinon.spy()
+            };
+            const usersController = new UsersController(fakeUserModel);
+            await usersController.authenticate(fakeReq, fakeRes);
+            sinon.assert.calledWith(fakeRes.send, {token: jwtToken});
+        });
+    })
 });

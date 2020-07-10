@@ -117,4 +117,34 @@ describe('Routes: Users', () => {
             })
         });
     });
+
+    describe('POST /users/authenticate', () => {
+        context('when authenticating an user', () => {
+            it('shoud generate a valid token', done => {
+                request
+                    .post('/users/authenticate')
+                    .send({
+                        email: 'jhon@mail.com',
+                        password: '123password'
+                    })
+                    .end((err, res) => {
+                        expect(res.body).to.have.key('token');
+                        expect(res.status).to.eql(200);
+                        done(err);
+                    });
+            });
+            it('shoud return unauthorized when the password does not match', done => {
+                request
+                    .post('/users/authenticate')
+                    .send({
+                        email: 'jhon@mail.com',
+                        password: 'wrongpassword'
+                    })
+                    .end((err, res) => {
+                        expect(res.status).to.eql(401);
+                        done(err);
+                    });
+            });
+       });
+    });
 })
