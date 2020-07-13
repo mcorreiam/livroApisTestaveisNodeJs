@@ -1,9 +1,10 @@
 const express = require('express');
 const UsersController = require('../controllers/users');
 const User = require('../models/user');
+const AuthService = require('../services/auth')
 
 const router = express.Router();
-const usersController = new UsersController(User);
+const usersController = new UsersController(User, AuthService);
 router.get('/', (req, res) => usersController.get(req, res));
 router.get('/:id', (req, res) => usersController.getById(req, res));
 router.post('/', (req, res) => usersController.create(req, res));

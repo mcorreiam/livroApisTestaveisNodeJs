@@ -1,4 +1,5 @@
 const User = require("../../../src/models/user");
+const AuthService = require("../../../src/services/auth")
 
 describe('Routes: Users', () => {
 
@@ -22,11 +23,12 @@ describe('Routes: Users', () => {
     };
 
     const expectedAdminUser = {
-        _id: defaultId,
-        name: 'Jhon Doe',
-        email: 'jhon@mail.com',
-        role: 'admin'
-    };
+        _id: defaultId,    
+        name: 'Jhon Doe',    
+        email: 'jhon@mail.com',    
+        role: 'admin'    
+      };    
+      const authToken = AuthService.generateToken(expectedAdminUser);
 
     beforeEach(async() => {
         const user = new User(defaultAdmin);
@@ -43,6 +45,7 @@ describe('Routes: Users', () => {
         it('should return a list of users', done => {
             
             request.get('/users')
+            .set({'x-access-token': authToken}) 
             .end((err, res) => {
                 expect(res.body).to.eql([expectedAdminUser]);
                 done(err);
@@ -53,6 +56,7 @@ describe('Routes: Users', () => {
             it('should return 200 with one user', done => {
                 request 
                 .get(`/users/${defaultId}`) 
+                .set({'x-access-token': authToken}) 
                 .end((err, res) => {
                     expect(res.statusCode).to.eql(200); 
                     expect(res.body).to.eql([expectedAdminUser]);
@@ -76,6 +80,7 @@ describe('Routes: Users', () => {
 
                request
                 .post('/users')
+                .set({'x-access-token': authToken}) 
                 .send(newUser)
                 .end((err, res) => {
                     expect(res.statusCode).to.eql(201);
@@ -96,6 +101,7 @@ describe('Routes: Users', () => {
 
                 request
                     .put(`/users/${defaultId}`)
+                    .set({'x-access-token': authToken}) 
                     .send(updatedUser)
                     .end((err, res) => {
                         expect(res.status).to.eql(200);
@@ -110,6 +116,7 @@ describe('Routes: Users', () => {
             it('shold delete a user and return 204 as status code', done => {                
                 request
                     .delete(`/users/${defaultId}`)
+                    .set({'x-access-token': authToken}) 
                     .end((err, res) => {
                         expect(res.status).to.eql(204);
                         done(err);

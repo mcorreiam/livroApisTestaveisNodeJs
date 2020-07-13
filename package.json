@@ -6,7 +6,12 @@
   "scripts": {
     "test": "npm run test:unit && npm run test:integration",
     "test:integration": "set NODE_ENV=test& mocha --config=test/integration/mocharc.json test/integration/**/*_spec.js",
-    "test:unit": "set NODE_ENV=test& mocha --config=test/unit/mocharc.json test/unit/**/*_spec.js"
+    "test:unit": "set NODE_ENV=test& mocha --config=test/unit/mocharc.json test/unit/**/*_spec.js",
+    "lint": "eslint src/**",
+    "lint:fix": "eslint src --fix --ext .js",
+    "prettier:list": "prettier --check 'src/**/*.js'",
+    "prettier:fix": "prettier --write 'src/**/*.js'",
+    "style:fix": "npm run lint:fix & npm run prettier:fix"
   },
   "author": "",
   "license": "ISC",
@@ -14,13 +19,17 @@
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "config": "^3.3.1",
+    "eslint-plugin-node": "^11.1.0",
     "express": "^4.17.1",
     "express-acl": "^2.0.8",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.9.19"
+    "mongoose": "^5.9.19",
+    "prettier": "^2.0.5"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
+    "eslint": "^7.4.0",
     "mocha": "^8.0.1",
     "sinon": "^9.0.2",
     "supertest": "^4.0.2"

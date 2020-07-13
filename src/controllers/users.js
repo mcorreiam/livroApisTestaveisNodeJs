@@ -1,10 +1,7 @@
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const bcrypt = require('bcrypt');
-
 class UsersController {
-    constructor(User){
+    constructor(User, AuthService){
         this.User = User;
+        this.AuthService = AuthService;
     }
 
     async get(req, res){
@@ -58,7 +55,7 @@ class UsersController {
         } catch (err) {
             res.status(422).send(err.message);
         }
-    };
+    }
 
     async remove(req, res){
         try {
@@ -70,26 +67,19 @@ class UsersController {
     }
 
     async authenticate(req, res) {
-        const { email, password } = req.body;
-        
-        const user = await this.User.findOne({ email: email }); 
-        
-        if(!user.password == bcrypt.compareSync(password, user.password)){
-            res.sendStatus(401)
+        const authService = new this.AuthService(this.User);
+        const user = await authService.authenticate(req.body)
+        if(!user){
+            return res.sendStatus(401);
         }
-        const token = jwt.sign(
-            {
-                name: user.name,
-                email: user.email,
-                password: user.password,
-                role: user.role
-            },
-            config.get('auth.key'),
-            {
-                expiresIn: config.get('auth.tokenExpiresIn')
+        const token = this.AuthService.generateToken({
+            name: user.name,
+            email: user.email,
+            password: user.password,
+            role: user.role
             }
         );
-        res.send({token});
+        return res.send({token});
     }
 
 }

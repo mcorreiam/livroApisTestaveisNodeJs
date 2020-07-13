@@ -6,7 +6,6 @@ const connect = () => mongoose.connect(mongodbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-const close = () => mongoose.close();
 
 module.exports = {
     connect,
